@@ -1,0 +1,27 @@
+{
+  "name": "scraper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "a": "nodemon helper.js",
+    "test": "jest",
+    "start": "nodemon index.js",
+    "scrapeusers": "nodemon scrapeGroupUser.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
+    "mongoose": "^5.7.1",
+    "puppeteer": "^1.20.0",
+    "puppeteer-core": "^1.20.0"
+  },
+  "devDependencies": {
+    "jest": "^24.9.0"
+  },
+  "engines": {
+    "node": ">=10.0.0"
+  }
+}
