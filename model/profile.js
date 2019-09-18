@@ -5,10 +5,13 @@ const profileSchema = new mongoose.Schema({
     required: [true, "Must have facebookId"],
     unique: true
   },
-  name: {
+  name: String,
+  uid: {
     type: String,
-    required: [true, "Must have name"]
+    unique: true
   },
+  imgLarge: String,
+  imgSmall: String,
   gender: String,
   birthday: Date,
   education: String,
@@ -16,17 +19,37 @@ const profileSchema = new mongoose.Schema({
   locationFrom: String,
   work: String,
   followers: Number,
+  isVnuer: {
+    type: Boolean,
+    required: [true, "is vnuer?"],
+    default: false
+  },
+  lastPosts: Array,
   alternateName: String,
+  scrapingUser: String,
+  mutualFriendsWithSrapingUser: Number,
+  isFriendWithSrapingUser: Boolean,
+  crawlDate: { type: Date, default: Date.now },
   workDone: String,
   educationDone: String,
   educationBefore: String,
   joinedDate: Date,
   other: Array,
   socialNetworks: String,
-  crawlDate: { type: Date, default: Date.now },
   love: String,
   language: String,
-  religion: String
+  religion: String,
+  isMiniScraped: {
+    type: Boolean,
+    required: [true, "is mini scrapedd?"],
+    default: false
+  },
+  isFullScraped: {
+    type: Boolean,
+    required: [true, "is full scrapedd?"],
+    default: false
+  },
+  updatedScrape: Date
 });
 
 const Profile = mongoose.model("Profile", profileSchema);

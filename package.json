@@ -6,8 +6,8 @@
   "scripts": {
     "a": "nodemon helper.js",
     "test": "jest",
-    "start": "nodemon index.js",
-    "scrapeusers": "nodemon scrapeGroupUser.js"
+    "profile": "nodemon scrapeProfile.js",
+    "scrapeu1": "nodemon scrapeGroupUser.js"
   },
   "keywords": [],
   "author": "",

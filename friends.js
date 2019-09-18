@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 const helper = require("./helpers");
 const Profile = require("./model/profile");
 
-const username = "caotrido1120@gmail.com";
-const password = "130196";
+const username = "hcmftu2@gmail.com";
+const password = "13011996";
 
 const DB = "mongodb://localhost:27017/facebook";
 
@@ -17,7 +17,7 @@ mongoose
   })
   .then(con => {
     // console.log(con.connections);
-    console.log("DB connect successfull !");
+    console.log("DB connect successful !");
   });
 
 function delay(time) {
@@ -40,7 +40,7 @@ async function autoScroll(page) {
           clearInterval(timer);
           resolve();
         }
-      }, 600);
+      }, 100);
     });
   });
 }
@@ -66,62 +66,60 @@ async function autoScroll(page) {
   });
 
   console.log("Bypass");
-  const group = "305319406598678";
-  // await page.goto(
-  //   `https://m.facebook.com/browse/group/members/?id=${group}&start=0`
-  // );
-  // await autoScroll(page);
-  // const results1 = await page.evaluate(() => {
-  //   const usersElements = document.querySelectorAll("._5xu4 a");
 
-  //   let users = [];
-  //   usersElements.forEach(user => {
-  //     if (
-  //       user.getAttribute("href") &&
-  //       user.getAttribute("href").includes("?fref=gm")
-  //     ) {
-  //       users.push(
-  //         user
-  //           .getAttribute("href")
-  //           .replace("/", "")
-  //           .replace("?fref=gm", "")
-  //       );
-  //     }
-  //   });
-  //   return users;
-  // });
-
-  await page.goto(
-    `https://m.facebook.com/browse/group/members/?id=${group}&start=0&listType=list_nonfriend_nonadmin`
-  );
+  await page.goto(`https://m.facebook.com/profile.php?v=friends`);
+  await delay(5000);
   await autoScroll(page);
   const results2 = await page.evaluate(() => {
-    const usersElements = document.querySelectorAll("._5xu4 a");
+    const usersElements = document.querySelectorAll("._52jh._5pxc a");
+    const mutualFriends = document.querySelectorAll(".notice.ellipsis");
+    const isFriendWithSrapingUser = document.querySelectorAll(
+      "._54k8._52jg._56bs._26vk._2b4n._56bt"
+    );
 
     let users = [];
-    usersElements.forEach(user => {
+
+    for (let i = 0; i < usersElements.length; i++) {
       if (
-        user.getAttribute("href") &&
-        user.getAttribute("href").includes("?fref=gm")
+        usersElements[i].getAttribute("href") !== null &&
+        mutualFriends[i].innerText.includes("bạn chung")
       ) {
-        users.push(
-          user
+        users.push({
+          facebookId: usersElements[i]
             .getAttribute("href")
+            .replace("/profile.php?id=", "")
             .replace("/", "")
-            .replace("?fref=gm", "")
-        );
+            .replace("?", "")
+            .replace("&", "")
+            .replace("refid=17", ""),
+          name: usersElements[i].innerText,
+          mutualFriendsWithSrapingUser: mutualFriends[i].innerText
+            .replace(".", "")
+            .replace(" bạn chung", ""),
+
+          isFriendWithSrapingUser:
+            isFriendWithSrapingUser[i].getAttribute("value") === "Bạn bè"
+              ? true
+              : false
+        });
       }
-    });
+    }
     return users;
   });
+  // console.log(`Found ${results2.users.length}/${results2.element} users`);
+  // console.log(results2.users);
   console.log(`Found ${results2.length} users`);
   results2.forEach(async user => {
-    const scrapingProfile = await Profile.findOne({ facebookId: user });
+    // console.log(user);
+    const scrapingProfile = await Profile.findOne({
+      facebookId: user.facebookId
+    });
     if (!scrapingProfile) {
       console.log("new user", user);
-      await Profile.create({ facebookId: user });
+      await Profile.create({ ...user, scrapingUser: username });
     }
   });
+
   // await page.screenshot({ path: "facebook.png" });
 
   // await browser.close();

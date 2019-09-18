@@ -1,5 +1,6 @@
 const puppeteer = require("puppeteer");
 const mongoose = require("mongoose");
+const User = require("./model/user");
 
 const username = "aohoa1303@gmail.com";
 const password = "13011996";
@@ -73,44 +74,43 @@ async function autoScroll(page) {
     const scrapingProfile = await Profile.findOne({ facebookId: profiles[i] });
     if (!scrapingProfile) {
       console.log("-------------Crawling friends....waiting10seconds");
-      // await page.goto(`https://m.facebook.com/${profiles[i]}/friends`);
-      // await autoScroll(page);
-      // console.log("before waiting");
-      // // await delay(10000);
-      // console.log("after waiting");
-      // const results3 = await page.evaluate(() => {
-      //   let friends = document.querySelectorAll("._52jh._5pxc a");
+      await page.goto(`https://m.facebook.com/${profiles[i]}/friends`);
+      await autoScroll(page);
+      const results3 = await page.evaluate(() => {
+        let friends = document.querySelectorAll("._52jh._5pxc a");
 
-      //   let friendsText = [];
-      //   friends.forEach(info =>
-      //     friendsText.push({
-      //       name: info.innerText,
-      //       url: info
-      //         .getAttribute("href")
-      //         .replace("/", "")
-      //         .replace("profile.php?id=", "")
-      //     })
-      //   );
-      //   // let profileHomePage = { other: [] };
-      //   // friendsText.forEach(info => {
-      //   //   console.log(info);
-      //   //   if (info.includes("Chuyển tới")) {
-      //   //   }
-      //   //   friends.forEach(info => friendsText.push(info.innerText));
-      //   //   for (let i = 0; i < lastPostsTimestamp; i++) {
-      //   //     console.log(lastPostsTimestamp[i], lastPostsLikes[i]);
-      //   //     profileHomePage.lastPostsTimestamp.push(
-      //   //       lastPostsTimestamp[i].innerText
-      //   //     );
-      //   //     profileHomePage.lastPostsLikes.push(lastPostsLikes[i].innerText);
-      //   //   }
-      //   // });
-      //   return friendsText;
-      // });
+        let friendsText = [];
+        friends.forEach(info =>
+          friendsText.push({
+            name: info.innerText,
+            url: info
+              .getAttribute("href")
+              .replace("/", "")
+              .replace("profile.php?id=", "")
+          })
+        );
+        // let profileHomePage = { other: [] };
+        // friendsText.forEach(info => {
+        //   console.log(info);
+        //   if (info.includes("Chuyển tới")) {
+        //   }
+        //   friends.forEach(info => friendsText.push(info.innerText));
+        //   for (let i = 0; i < lastPostsTimestamp; i++) {
+        //     console.log(lastPostsTimestamp[i], lastPostsLikes[i]);
+        //     profileHomePage.lastPostsTimestamp.push(
+        //       lastPostsTimestamp[i].innerText
+        //     );
+        //     profileHomePage.lastPostsLikes.push(lastPostsLikes[i].innerText);
+        //   }
+        // });
+        return friendsText;
+      });
 
-      const newProfile = await Profile.create({ ...results1, ...results2 });
-      console.log(newProfile);
-      crawl.push(newProfile);
+      console.log(`Found ${results2.length} users`);
+      results2.forEach(async user => {
+        console.log(user);
+        await User.create({ facebookId: user });
+      });
     }
   }
   await page.screenshot({ path: "facebook.png" });
